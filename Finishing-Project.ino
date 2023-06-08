@@ -93,7 +93,7 @@ void MainLoop()
 
     buttonDown = digitalRead(BTN_PIN) == LOW;
 
-    if(magnitude > 5){
+    if(magnitude > 100){
         neoPixel.setPixelColor(4, selection, colors[selection]);
         selection = pixels;
         lcd.clear();
@@ -123,7 +123,7 @@ void MainLoop()
          + " Stick Unisgned Angle: " + String(uAngle*180/M_PI, DEC) + 
          " Magnitude: " + String(magnitude, DEC) + 
          " Pixels: " + String(pixels, DEC);// + "Stick Y: " + stickY;
-    Serial.println(digitalRead(2));
+    Serial.println(debugString);
     #pragma endregion
 
     delay(250);
