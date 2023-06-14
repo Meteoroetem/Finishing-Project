@@ -16,8 +16,20 @@ NeoPixel neoPixel(16,4,NEO_GRB + NEO_KHZ800);
 LiquidCrystal_I2C lcd(0x27,16,2);
 Vector2 stickPos;
 
-uint32_t colors[] = {neoPixel.Color(239, 71, 111), neoPixel.Color(75, 163, 195), neoPixel.Color(89, 60, 143), neoPixel.Color(249, 219, 189)};
-String sentences[] = {"The Electronics Megama was established", "Vered joined the school", "The school was established", "Sisko became CEO"};
+uint32_t colors[] = 
+{
+    neoPixel.Color(239, 71, 111), 
+    neoPixel.Color(75, 163, 195), 
+    neoPixel.Color(89, 60, 143), 
+    neoPixel.Color(249, 219, 189)
+};
+String sentences[] = 
+{
+    "The Electronics Megama was established", 
+    "Vered joined the school", 
+    "The school was established", 
+    "Sisko became CEO"
+};
 
 
 int selection;
@@ -96,8 +108,6 @@ void loop()
             lcd.print(sentences[selection]);
         }
     }
-
-
 }
 
 void MainLoop()
@@ -107,7 +117,9 @@ void MainLoop()
     int uAngle = stickPos.GetUnsignedAngle();
     double magnitude = stickPos.GetMagnitude();
     //* Gets the segment of the neopixel that needs to blink now
-    int quarterNum = (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4))>= 0.5 ? floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
+    int quarterNum = 
+        (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4)) >= 0.5 ? 
+        floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
 
     if(millis()%300 == 0){
         if(magnitude > 100){
