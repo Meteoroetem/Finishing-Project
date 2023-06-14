@@ -1,5 +1,6 @@
 #include<Wire.h>
 #include<LiquidCrystal_I2C.h>
+#include<ezButton.h>
 #include "NeoPixel.h"
 #include "Vector2.h"
 #ifdef __AVR__
@@ -10,6 +11,7 @@
 #define STCK_X_PIN A0
 #define STCK_Y_PIN A1
 
+ezButton butt(2);
 NeoPixel neoPixel(16,4,NEO_GRB + NEO_KHZ800);
 LiquidCrystal_I2C lcd(0x27,16,2);
 Vector2 stickPos;
@@ -20,14 +22,14 @@ String sentences[] = {"The Electronics Megama was established", "Vered joined th
 
 int selection;
 bool blinkOn = true;
-bool buttonDown = false;
-bool buttonWasDown = false;
+///bool buttonDown = false;
+///bool buttonWasDown = false;
 byte passInput[4];
 byte currentDigit = 0;
 
 void setup()
 {
-    pinMode(2, INPUT_PULLUP);
+    ////pinMode(BTN_PIN, INPUT_PULLUP);
     lcd.init();
     ////lcd.begin(16,2);
     lcd.backlight();
@@ -62,11 +64,12 @@ void setup()
 
 void loop()
 {
+    butt.loop();
     if(currentDigit != 4){
         MainLoop();
     }
     else{
-        if(passInput == new byte[4]{2, 1, 3, 0}){
+        if(passInput[0] == 2 && passInput[1] == 1 && passInput[2] == 3 && passInput[3] == 0){
             lcd.clear();
             lcd.home();
             lcd.print("Congrats!!");
@@ -78,9 +81,13 @@ void loop()
             lcd.print("Incorrect!!");
             currentDigit = 0;
             delay(1000);
+            lcd.clear();
+            lcd.home();
             lcd.print(sentences[selection]);
         }
     }
+
+
 }
 
 void MainLoop()
@@ -89,42 +96,44 @@ void MainLoop()
     stickPos.y = analogRead(STCK_Y_PIN)-511;
     int uAngle = stickPos.GetUnsignedAngle();
     double magnitude = stickPos.GetMagnitude();
+    //* Gets the segment of the neopixel that needs to blink now
     int pixels = (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4))>= 0.5 ? floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
+    ////buttonDown = digitalRead(BTN_PIN) == LOW;
+    ////Serial.println(butt.getState());
 
-    buttonDown = digitalRead(BTN_PIN) == LOW;
-
-    if(magnitude > 100){
-        neoPixel.setPixelColor(4, selection, colors[selection]);
+    if(magnitude > 100 && millis()%300 == 0){
+        neoPixel.setPixelColor(4, selection, colors[selection]);//* So that the segment won't stay unlit
         selection = pixels;
         lcd.clear();
         lcd.setCursor(1,0);
-        lcd.print(sentences[selection]);
-        
+        lcd.print(sentences[pixels]); 
     }
 
     neoPixel.setPixelColor(4, selection, blinkOn ? colors[selection] : 0);
-    blinkOn = !blinkOn;
+    if(millis()%300 == 0) blinkOn = !blinkOn;
 
-    lcd.scrollDisplayLeft();
+    if(millis()%300 == 0) lcd.scrollDisplayLeft();
 
     neoPixel.show();
 
-    if(!buttonWasDown && buttonDown){
-        Serial.println("Button pressed");
+    if(butt.isPressed()){
+        Serial.println("Button pressed" + String(currentDigit, DEC));
         passInput[currentDigit] = selection;
         currentDigit++;
     }
 
-    buttonWasDown = digitalRead(BTN_PIN) == LOW;
+
+    ////buttonWasDown = digitalRead(BTN_PIN) == LOW;
+
 
     #pragma region Debug Printing
-    String debugString = "Stick X: " + String(stickPos.x, DEC)
+    /*String debugString = "Stick X: " + String(stickPos.x, DEC)
          + " Stick Y: " + String(stickPos.y, DEC) + " Stick Angle: " + String(stickPos.GetSignedAngle()*180/M_PI, DEC)
          + " Stick Unisgned Angle: " + String(uAngle*180/M_PI, DEC) + 
          " Magnitude: " + String(magnitude, DEC) + 
-         " Pixels: " + String(pixels, DEC);// + "Stick Y: " + stickY;
-    Serial.println(debugString);
+         " selection: " + String(selection, DEC) + " Current Digit: " + String(currentDigit, DEC);// + "Stick Y: " + stickY;
+    Serial.println(debugString);*/
     #pragma endregion
 
-    delay(250);
+    ////delay(300);
 }
