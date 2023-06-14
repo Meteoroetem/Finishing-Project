@@ -29,37 +29,37 @@ byte currentDigit = 0;
 
 void setup()
 {
-    ////pinMode(BTN_PIN, INPUT_PULLUP);
     lcd.init();
-    ////lcd.begin(16,2);
     lcd.backlight();
-    ////lcd.autoscroll();
-    ////lcd.scrollDisplayLeft();
 
 	neoPixel.begin();
     neoPixel.clear();
     neoPixel.setBrightness(10);
 
-    for(int pixel = 0; pixel < 16; pixel++){
-        neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
-        neoPixel.show();
-        delay(50);
-    }
-    for (int pixel = 0; pixel < 16; pixel++)
-    {
-        neoPixel.setPixelColor(pixel,0,0,0);
-        neoPixel.show();
-        delay(50);
-    }
-    for(int pixel = 0; pixel < 16; pixel++){
-        neoPixel.setPixelColor(pixel, colors[pixel/4]);
-        neoPixel.show();
-        delay(50);
-    }
-    lcd.setCursor(1,0);
-    lcd.print(sentences[0]);
+    lcd.home();
+    lcd.print("Solve the");
+    lcd.setCursor(0,1);
+    lcd.print("previous riddle!");
+    lcd.noAutoscroll();
 
     Serial.begin(9600);
+    int p13read = digitalRead(13);
+    while (p13read != HIGH){
+        p13read = digitalRead(13);
+        for(int pixel = 0; pixel < 16; pixel++){
+            neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
+            neoPixel.show();
+            delay(50);
+        }
+        for(int pixel = 0; pixel < 16; pixel++){
+            neoPixel.setPixelColor(pixel, colors[pixel/4]);
+            neoPixel.show();
+            delay(50);
+        }
+    }
+    lcd.clear();
+    lcd.home();
+    lcd.print(sentences[0]);
 }
 
 void loop()
@@ -73,7 +73,19 @@ void loop()
             lcd.clear();
             lcd.home();
             lcd.print("Congrats!!");
-            while(true){digitalWrite(13,HIGH);}
+            while(true){
+                digitalWrite(12,HIGH);
+                for(int pixel = 0; pixel < 16; pixel++){
+                    neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
+                    neoPixel.show();
+                    delay(50);
+                }
+                for(int pixel = 0; pixel < 16; pixel++){
+                        neoPixel.setPixelColor(pixel, colors[pixel/4]);
+                        neoPixel.show();
+                        delay(50);
+                    }
+                }
         }
         else{
             lcd.clear();
@@ -97,22 +109,25 @@ void MainLoop()
     int uAngle = stickPos.GetUnsignedAngle();
     double magnitude = stickPos.GetMagnitude();
     //* Gets the segment of the neopixel that needs to blink now
-    int pixels = (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4))>= 0.5 ? floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
+    int quarterNum = (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4))>= 0.5 ? floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
     ////buttonDown = digitalRead(BTN_PIN) == LOW;
     ////Serial.println(butt.getState());
 
-    if(magnitude > 100 && millis()%300 == 0){
-        neoPixel.setPixelColor(4, selection, colors[selection]);//* So that the segment won't stay unlit
-        selection = pixels;
-        lcd.clear();
-        lcd.setCursor(1,0);
-        lcd.print(sentences[pixels]); 
+    ////buttonDown = digitalRead(BTN_PIN) == LOW;
+
+    if(millis()%300 == 0){
+        if(magnitude > 100){
+            neoPixel.setPixelColor(4, selection, colors[selection]);
+            selection = quarterNum;
+            lcd.clear();
+            lcd.setCursor(1,0);
+            lcd.print(sentences[selection]); 
+        }
+
+        neoPixel.setPixelColor(4, selection, blinkOn ? colors[selection] : 0);
+        blinkOn = !blinkOn;
+        lcd.scrollDisplayLeft();
     }
-
-    neoPixel.setPixelColor(4, selection, blinkOn ? colors[selection] : 0);
-    if(millis()%300 == 0) blinkOn = !blinkOn;
-
-    if(millis()%300 == 0) lcd.scrollDisplayLeft();
 
     neoPixel.show();
 
@@ -122,7 +137,6 @@ void MainLoop()
         currentDigit++;
     }
 
-
     ////buttonWasDown = digitalRead(BTN_PIN) == LOW;
 
 
@@ -131,9 +145,9 @@ void MainLoop()
          + " Stick Y: " + String(stickPos.y, DEC) + " Stick Angle: " + String(stickPos.GetSignedAngle()*180/M_PI, DEC)
          + " Stick Unisgned Angle: " + String(uAngle*180/M_PI, DEC) + 
          " Magnitude: " + String(magnitude, DEC) + 
-         " selection: " + String(selection, DEC) + " Current Digit: " + String(currentDigit, DEC);// + "Stick Y: " + stickY;
-    Serial.println(debugString);*/
+         " Pixels: " + String(quarterNum, DEC);*/// + "Stick Y: " + stickY;
+    ////Serial.println(buttonDown);
     #pragma endregion
 
-    ////delay(300);
+    ////delay(250);
 }
