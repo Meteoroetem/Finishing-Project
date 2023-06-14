@@ -22,8 +22,6 @@ String sentences[] = {"The Electronics Megama was established", "Vered joined th
 
 int selection;
 bool blinkOn = true;
-///bool buttonDown = false;
-///bool buttonWasDown = false;
 byte passInput[4];
 byte currentDigit = 0;
 
@@ -110,10 +108,6 @@ void MainLoop()
     double magnitude = stickPos.GetMagnitude();
     //* Gets the segment of the neopixel that needs to blink now
     int quarterNum = (uAngle*180/M_PI)/(360/4) - floor((uAngle*180/M_PI)/(360/4))>= 0.5 ? floor((uAngle*180/M_PI)/(360/4)) + 1 : floor((uAngle*180/M_PI)/(360/4));
-    ////buttonDown = digitalRead(BTN_PIN) == LOW;
-    ////Serial.println(butt.getState());
-
-    ////buttonDown = digitalRead(BTN_PIN) == LOW;
 
     if(millis()%300 == 0){
         if(magnitude > 100){
@@ -136,18 +130,4 @@ void MainLoop()
         passInput[currentDigit] = selection;
         currentDigit++;
     }
-
-    ////buttonWasDown = digitalRead(BTN_PIN) == LOW;
-
-
-    #pragma region Debug Printing
-    /*String debugString = "Stick X: " + String(stickPos.x, DEC)
-         + " Stick Y: " + String(stickPos.y, DEC) + " Stick Angle: " + String(stickPos.GetSignedAngle()*180/M_PI, DEC)
-         + " Stick Unisgned Angle: " + String(uAngle*180/M_PI, DEC) + 
-         " Magnitude: " + String(magnitude, DEC) + 
-         " Pixels: " + String(quarterNum, DEC);*/// + "Stick Y: " + stickY;
-    ////Serial.println(buttonDown);
-    #pragma endregion
-
-    ////delay(250);
 }
