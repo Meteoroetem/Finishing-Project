@@ -29,40 +29,37 @@ byte currentDigit = 0;
 
 void setup()
 {
-    ////pinMode(BTN_PIN, INPUT_PULLUP);
     lcd.init();
-    ////lcd.begin(16,2);
     lcd.backlight();
-    ////lcd.autoscroll();
-    ////lcd.scrollDisplayLeft();
 
 	neoPixel.begin();
     neoPixel.clear();
     neoPixel.setBrightness(10);
 
-    for(int pixel = 0; pixel < 16; pixel++){
-        neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
-        neoPixel.show();
-        delay(50);
-    }
-    for (int pixel = 0; pixel < 16; pixel++)
-    {
-        neoPixel.setPixelColor(pixel,0,0,0);
-        neoPixel.show();
-        delay(50);
-    }
-    for(int pixel = 0; pixel < 16; pixel++){
-        neoPixel.setPixelColor(pixel, colors[pixel/4]);
-        neoPixel.show();
-        delay(50);
-    }
-    lcd.setCursor(1,0);
-    lcd.print(sentences[0]);
+    lcd.home();
+    lcd.print("Solve the");
+    lcd.setCursor(0,1);
+    lcd.print("previous riddle!");
+    lcd.noAutoscroll();
 
     Serial.begin(9600);
-    /*int p12read = digitalRead(12);
-    while (p12read != HIGH)
-        p12read = digitalRead(12);*/
+    int p13read = digitalRead(13);
+    while (p13read != HIGH){
+        p13read = digitalRead(13);
+        for(int pixel = 0; pixel < 16; pixel++){
+            neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
+            neoPixel.show();
+            delay(50);
+        }
+        for(int pixel = 0; pixel < 16; pixel++){
+            neoPixel.setPixelColor(pixel, colors[pixel/4]);
+            neoPixel.show();
+            delay(50);
+        }
+    }
+    lcd.clear();
+    lcd.home();
+    lcd.print(sentences[0]);
 }
 
 void loop()
@@ -77,7 +74,7 @@ void loop()
             lcd.home();
             lcd.print("Congrats!!");
             while(true){
-                digitalWrite(13,HIGH);
+                digitalWrite(12,HIGH);
                 for(int pixel = 0; pixel < 16; pixel++){
                     neoPixel.setPixelColor(pixel, neoPixel.ColorHSV(pixel*4096,255,255-pixel));
                     neoPixel.show();
